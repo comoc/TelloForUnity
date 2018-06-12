@@ -6,3 +6,4 @@ This project is including the following modules.
 * Self built DLLs of [FFmpeg](https://www.ffmpeg.org/)
 
 At this time, Windows 64 bit version only.
+.NET 4.x is required in your Unity Player settings.
