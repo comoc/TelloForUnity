@@ -213,7 +213,7 @@ GameObject:
   - component: {fileID: 291538282}
   - component: {fileID: 291538283}
   m_Layer: 0
-  m_Name: Quad
+  m_Name: TelloQuad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
