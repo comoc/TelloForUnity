@@ -163,19 +163,27 @@ public:
 
 		int read_size = -1;
 		while (*isRunning) {
-			read_size = recvfrom(sock, buffer, buffer_size, 0, nullptr, nullptr);
+
+            read_size = static_cast<int>(recv(sock, buffer, static_cast<size_t>(buffer_size), 0));
+            if (read_size < 1) {
 #ifdef UNITY_WIN
-			if (WSAGetLastError() == WSAEWOULDBLOCK) {
+                if (WSAGetLastError() == WSAEWOULDBLOCK) {
+                    this_thread::yield();
 #else
-			if (errno == EAGAIN) {
+                if (errno == EAGAIN) {
+                    this_thread::yield();
+//                    this_thread::sleep_for(std::chrono::milliseconds(5));
 #endif
-				this_thread::yield();
-				continue;
-			}
-			else {
-				break;
-			}
+                    continue;
+                }
+                else {
+                    break;
+                }
+            } else {
+                break;
+            }
 		}
+            
 		return read_size;
 	}
 private:
