@@ -1,5 +1,3 @@
-A Tello control application project for Unity
-
 # TelloForUnity
 
 DJI Tello application development resources for Unity.
