@@ -14,9 +14,14 @@ At this time, Windows 64 bit and macOS 64 bit version only.
 
 ## Installation
 
-### macOS Specific
+### Windows Specific Settings
 
-* ```brew install ffmpeg x264``` is required.
+Please confirm the Windows Firewall settings of your Unity Editor. Plublic network access is required to access the video stream from Tello.
+![image.png](https://qiita-image-store.s3.amazonaws.com/0/39561/6e7de478-cbd8-be4f-1687-2f43135f9c10.png)
+
+### macOS Specific Settings
+
+* Before using, ```brew install x264 ffmpeg``` is required.
 
 ## Basic Usage
 
@@ -25,12 +30,7 @@ At this time, Windows 64 bit and macOS 64 bit version only.
 * Open the Scenes/Master scene.
 * Connect to Tello Wi-Fi.
 * Play.
-* Key assignments and Tello's battery status are displayed on the Game window.
-
-## Important
-
-Please conferm the Windows Firewall settings of Unity Editor. Plublic network access is required to access the video stream.
-![image.png](https://qiita-image-store.s3.amazonaws.com/0/39561/6e7de478-cbd8-be4f-1687-2f43135f9c10.png)
+* Key assignments and Tello's battery status are displayed in the Game window.
 
 ## Legal Information
 
