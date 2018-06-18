@@ -13,6 +13,11 @@
 // UNITY_ANDROID - Android
 // UNITY_METRO - WSA or UWP
 // UNITY_WEBGL - WebGL
+
+#if __ANDROID__ 
+	#define UNITY_ANDROID 1
+#endif
+
 #if _MSC_VER
 	#define UNITY_WIN 1
 #elif defined(__APPLE__)
