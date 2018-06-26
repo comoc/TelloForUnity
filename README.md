@@ -28,7 +28,7 @@ Please confirm the Windows Firewall settings of your Unity Editor. Public networ
 
 * Open the TelloUnityDemo project into Unity Editor.
 * Edit > Project Settings > Player > Other Settings > "Scripting Runtime Version" as ".NET 4.x Equiverent".
-* Open the Scenes/Master scene.
+* Open the Scenes/Main scene.
 * Connect to Tello Wi-Fi.
 * Play.
 * Key assignments and Tello's battery status are displayed in the Game window.
