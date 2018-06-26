@@ -16,7 +16,7 @@ At this time, Windows 64 bit and macOS 64 bit version only.
 
 ### Windows Specific Settings
 
-Please confirm the Windows Firewall settings of your Unity Editor. Public network access is required to access the video stream from Tello.
+Please confirm the Windows Firewall settings of your Unity Editor. Public network access is required to receive the video stream from Tello.
 
 ![image.png](https://qiita-image-store.s3.amazonaws.com/0/39561/6e7de478-cbd8-be4f-1687-2f43135f9c10.png)
 
