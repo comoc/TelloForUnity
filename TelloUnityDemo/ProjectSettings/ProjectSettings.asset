@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 15
-  productGUID: 29f84c9ae444e77478d5ce8d11c2c0ef
+  productGUID: af23953c1cbb1aa479bfc570c8e3a517
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -663,8 +663,8 @@ PlayerSettings:
     UNet: 1
   facebookSdkVersion: 7.9.4
   apiCompatibilityLevel: 2
-  cloudProjectId: ebdf4c4a-1fe9-4cf1-827d-0836c6d8d789
-  projectName: TelloUnityDemo
+  cloudProjectId: 31ec3d2b-705b-46e3-a532-88095067d446
+  projectName: TelloUnityDemo (1)
   organizationId: koozyt_komori
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
