@@ -40,42 +40,51 @@ extern "C" {
 #include "RenderAPI.h"
 #include "PlatformBase.h"
 
+#if defined(UNITY_ANDROID)
+#include <android/log.h>
+#endif
+
 using namespace std;
 
 namespace {
 	void debug_log(const char* msg)
 	{
-#if defined(_WIN32) && defined(_DEBUG)
+#if defined(UNITY_WIN)
+	#if defined(_DEBUG)
 		OutputDebugStringA(msg);
 		OutputDebugStringA("\r\n");
-#endif
+	#endif
+#elif defined (UNITY_ANDROID)
+	// #if !defined(NDEBUG)
+		__android_log_print(ANDROID_LOG_VERBOSE, "TelloVideoDecoder.cpp", "%s\n", msg);
+	// #endif
+#else
+	#if !defined(NDEBUG)
 		cout << msg << endl;
+	#endif
+#endif
 	}
-
 
 	const size_t PIXELS = 1280 * 720;
 	const size_t BPP = 4;
-	const size_t IMAGE_SIZE_IN_BYTE = PIXELS * BPP;
+	const size_t IMAGE_SIZE_IN_BYTES = PIXELS * BPP;
 
-	class StaticObject
+#ifdef UNITY_WIN
+	class StaticObjectForCleanup
 	{
 	public:
-		StaticObject()
+		StaticObjectForCleanup()
 		{
-#ifdef UNITY_WIN
 			WSADATA data;
 			WSAStartup(MAKEWORD(2, 0), &data);
-#endif
 		}
-		~StaticObject()
+		~StaticObjectForCleanup()
 		{
-#ifdef UNITY_WIN
 			WSACleanup();
-#endif
 		}
 	};
-
-	StaticObject _staticObject;
+	StaticObjectForCleanup _staticObject;
+#endif
 }
 
 class MyUdpClient
@@ -129,7 +138,7 @@ public:
 				return true;
 			}
 			else {
-                ::close(sock);
+				::close(sock);
 				sock = -1;
 			}
 #endif
@@ -146,7 +155,7 @@ public:
 		}
 #else
 		if (sock != -1) {
-            ::close(sock);
+			::close(sock);
 			sock = -1;
 		}
 #endif
@@ -161,29 +170,41 @@ public:
 #endif
 			return -1;
 
+		// TODO
+#if 0//def UNITY_ANDROID
+		fd_set fds;
+		FD_ZERO(&fds);
+		FD_SET(sock, &fds);
+		select(sock+1, &fds, NULL, NULL, NULL);
+		if (FD_ISSET(sock, &fds) == 0) {
+			return 0;
+		}
+#endif
+
 		int read_size = -1;
 		while (*isRunning) {
 
-            read_size = static_cast<int>(recv(sock, buffer, static_cast<size_t>(buffer_size), 0));
-            if (read_size < 1) {
+			read_size = static_cast<int>(recv(sock, buffer, static_cast<size_t>(buffer_size), 0));
+			if (read_size < 1) {
 #ifdef UNITY_WIN
-                if (WSAGetLastError() == WSAEWOULDBLOCK) {
-                    this_thread::yield();
+				if (WSAGetLastError() == WSAEWOULDBLOCK) {
+					this_thread::yield();
 #else
-                if (errno == EAGAIN) {
-                    this_thread::yield();
-//                    this_thread::sleep_for(std::chrono::milliseconds(5));
+				if (errno == EAGAIN) {
+					this_thread::yield();
+					// this_thread::sleep_for(std::chrono::milliseconds(5));
 #endif
-                    continue;
-                }
-                else {
-                    break;
-                }
-            } else {
-                break;
-            }
+					continue;
+				}
+				else {
+					break;
+				}
+			}
+			else {
+				break;
+			}
 		}
-            
+
 		return read_size;
 	}
 private:
@@ -199,10 +220,14 @@ class MyTelloUdpAVIOContext
 {
 public:
 	MyTelloUdpAVIOContext(const char* address, int port, bool* isRunning)
-		: avio_ctx(nullptr), buffer2(nullptr), udp(isRunning) {
+		: avio_ctx(nullptr), udp(isRunning), buffer2(nullptr), buffer2_size(0), fragment_index(0) {
 		//avformat_network_init(); // not necessary
 
 		buffer = static_cast<unsigned char*>(av_malloc(BUFFER_SIZE));
+		//srand(static_cast<unsigned int>(time(0)));
+		//for (int i = 0; i < BUFFER_SIZE; i++)
+		//	buffer[i] = static_cast<unsigned char>(rand() * 255 / RAND_MAX);
+
 		avio_ctx = avio_alloc_context(buffer, BUFFER_SIZE, 0, this, &MyTelloUdpAVIOContext::read, nullptr, nullptr);
 
 		if (!udp.open(port)) {
@@ -222,7 +247,7 @@ public:
 	static int read(void *opaque, unsigned char *buf, int buf_size) {
 		MyTelloUdpAVIOContext* h = static_cast<MyTelloUdpAVIOContext*>(opaque);
 
-		stringstream ss;
+		// TODO  should build a complete I frame.
 
 		if (buf_size + 2 > h->buffer2_size) {
 			if (h->buffer2 != nullptr)
@@ -234,11 +259,29 @@ public:
 		if (read_size <= 0) {
 			return 0;
 		}
-
+// TODO
 		uint8_t b0 = (uint8_t)h->buffer2[0];
 		uint8_t b1 = (uint8_t)h->buffer2[1];
-		ss << "buf_size: " << buf_size << ", read_size:" << read_size << " [0]:" << (int)b0 << " [1]:" << (int)b1;
-		debug_log(ss.str().c_str());
+
+		{
+			stringstream ss;
+			ss << "buf_size: " << buf_size << ", read_size:" << read_size << " [0]:" << (int)b0 << " [1]:" << (int)b1;
+			debug_log(ss.str().c_str());
+		}
+
+		if (read_size >= 6 && h->buffer2[2] == 0 && h->buffer2[3] == 0 && h->buffer2[4] == 0 && h->buffer2[5] == 1) {
+			debug_log("NAL");
+			h->fragment_index = 0;
+		}
+		else {
+			h->fragment_index++;
+		}
+
+		{
+			stringstream ss;
+			ss << "fragment_index: " << h->fragment_index;
+			debug_log(ss.str().c_str());
+		}
 
 		read_size -= 2;
 		memcpy(buf, h->buffer2 + 2, read_size);
@@ -249,13 +292,14 @@ public:
 	AVIOContext* get() { return avio_ctx; }
 
 private:
-	static const int BUFFER_SIZE = 32768;
+	static const int BUFFER_SIZE = IMAGE_SIZE_IN_BYTES;
 	unsigned char* buffer;
 	AVIOContext * avio_ctx;
 	MyUdpClient udp;
 
 	char* buffer2;
 	int buffer2_size;
+	int fragment_index;
 };
 
 class MyVideoDecoder {
@@ -318,9 +362,12 @@ public:
 #endif
 
 					debug_log(ss.str().c_str());
-					mtx->lock();
-					memcpy(destination, frame_rgba->data[0], size);
-					mtx->unlock();
+
+					{
+						lock_guard<mutex> lock(*mtx);
+						memcpy(destination, frame_rgba->data[0], size);
+					}
+
 					frameCounter++;
 				}
 			}
@@ -500,6 +547,7 @@ extern "C" {
 	struct TelloVideoDecoderContext {
 		bool isRunning_ = true;
 		uint8_t* imageBuffer_ = nullptr;
+		size_t imageBufferSize = 0;
 		thread* thread_ = nullptr;
 		mutex mutex_;
 	};
@@ -508,7 +556,7 @@ extern "C" {
 	{
 		MyVideoDecoder decoder;
 		while (ctx->isRunning_) {
-			decoder.run(ctx->imageBuffer_, IMAGE_SIZE_IN_BYTE, &ctx->mutex_, &ctx->isRunning_);
+			decoder.run(ctx->imageBuffer_, ctx->imageBufferSize, &ctx->mutex_, &ctx->isRunning_);
 			this_thread::yield();
 		}
 	}
@@ -517,20 +565,11 @@ extern "C" {
 	{
 		TelloVideoDecoderContext* ctx = new TelloVideoDecoderContext();
 
-		ctx->imageBuffer_ = new uint8_t[IMAGE_SIZE_IN_BYTE];
-		for (int i = 0; i < IMAGE_SIZE_IN_BYTE; i += BPP) {
-			for (int j = 0; j < BPP; j++) {
-				if (j == 3)
-					ctx->imageBuffer_[i + j] = 0xff;
-				else if (j == 2)
-					ctx->imageBuffer_[i + j] = 0x10;
-				else
-					ctx->imageBuffer_[i + j] = 0;
-			}
-		}
+		ctx->imageBufferSize = IMAGE_SIZE_IN_BYTES;
+		ctx->imageBuffer_ = new uint8_t[ctx->imageBufferSize];
+		memset(ctx->imageBuffer_, 0x80, ctx->imageBufferSize);
 
 		ctx->isRunning_ = true;
-
 		ctx->thread_ = new thread(decode, ctx);
 
 		return ctx;
@@ -557,18 +596,17 @@ extern "C" {
 		ctx = nullptr;
 	}
 
-	void TelloVideoDecoder_ModifyTexturePixels(TelloVideoDecoderContext* ctx, void* data, int width, int height)
+	void TelloVideoDecoder_ModifyTexturePixels(TelloVideoDecoderContext* ctx, void* data, int width, int height, int rowPitch)
 	{
 		//debug_log("TelloVideoDecoder_ModifyTexturePixels begin");
 
-		int size = width * height * 4;
-		size = min<int>(size, IMAGE_SIZE_IN_BYTE);
+		size_t size = static_cast<size_t>(rowPitch * height);
+		size = min<size_t>(size, ctx->imageBufferSize);
 
 		if (ctx != nullptr) {
-			ctx->mutex_.lock();
+			lock_guard<mutex> lock(ctx->mutex_);
 			if (ctx->imageBuffer_ != nullptr)
 				memcpy(data, ctx->imageBuffer_, size);
-			ctx->mutex_.unlock();
 		}
 		//debug_log("TelloVideoDecoder_ModifyTexturePixels end");
 	}

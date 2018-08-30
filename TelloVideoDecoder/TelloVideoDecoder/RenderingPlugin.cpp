@@ -21,9 +21,9 @@ extern "C"
 	struct TelloVideoDecoderContext;
 	TelloVideoDecoderContext* TelloVideoDecoder_Open();
 	void TelloVideoDecoder_Close(TelloVideoDecoderContext* ctx);
-	void TelloVideoDecoder_ModifyTexturePixels(TelloVideoDecoderContext* ctx, void* data, int width, int height);
+	void TelloVideoDecoder_ModifyTexturePixels(TelloVideoDecoderContext* ctx, void* data, int width, int height, int rowPitch);
 }
-	
+
 
 
 // --------------------------------------------------------------------------
@@ -59,7 +59,7 @@ extern "C" void	UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnit
 	s_UnityInterfaces = unityInterfaces;
 	s_Graphics = s_UnityInterfaces->Get<IUnityGraphics>();
 	s_Graphics->RegisterDeviceEventCallback(OnGraphicsDeviceEvent);
-	
+
 	// Run OnGraphicsDeviceEvent(initialize) manually on plugin load
 	OnGraphicsDeviceEvent(kUnityGfxDeviceEventInitialize);
 
@@ -138,12 +138,8 @@ static void ModifyTexturePixels()
 	if (!textureDataPtr)
 		return;
 
-	unsigned char* dst = (unsigned char*)textureDataPtr;
-#if 1
-	TelloVideoDecoder_ModifyTexturePixels(s_TelloContext, dst, width, height);
-#else
-	memset(dst, 0x0f, textureRowPitch * height);
-#endif
+	TelloVideoDecoder_ModifyTexturePixels(s_TelloContext, (unsigned char*)textureDataPtr, width, height, textureRowPitch);
+
 	s_CurrentAPI->EndModifyTexture(textureHandle, width, height, textureRowPitch, textureDataPtr);
 }
 
