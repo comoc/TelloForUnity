@@ -220,14 +220,17 @@ class MyTelloUdpAVIOContext
 {
 public:
 	MyTelloUdpAVIOContext(const char* address, int port, bool* isRunning)
-		: avio_ctx(nullptr), udp(isRunning), buffer2(nullptr), buffer2_size(0), fragment_index(0) {
+		: avio_ctx(nullptr)
+		, udp(isRunning)
+		, i_frame_buffer(nullptr)
+		, i_frame_buffer_filled_size(0)
+		, fragment_index(0)
+		, udp_recieve_buffer(nullptr) {
 		//avformat_network_init(); // not necessary
 
 		buffer = static_cast<unsigned char*>(av_malloc(BUFFER_SIZE));
-		//srand(static_cast<unsigned int>(time(0)));
-		//for (int i = 0; i < BUFFER_SIZE; i++)
-		//	buffer[i] = static_cast<unsigned char>(rand() * 255 / RAND_MAX);
-
+		i_frame_buffer = new uint8_t[BUFFER_SIZE];
+		udp_recieve_buffer = new char[UDP_RECIEVE_BUFFER_SIZE];
 		avio_ctx = avio_alloc_context(buffer, BUFFER_SIZE, 0, this, &MyTelloUdpAVIOContext::read, nullptr, nullptr);
 
 		if (!udp.open(port)) {
@@ -238,8 +241,11 @@ public:
 	~MyTelloUdpAVIOContext() {
 		av_freep(&avio_ctx->buffer);
 		av_freep(&avio_ctx);
-		if (buffer2 != nullptr)
-			delete[] buffer2;
+		if (i_frame_buffer != nullptr)
+			delete[] i_frame_buffer;
+
+		if (udp_recieve_buffer != nullptr)
+			delete[] udp_recieve_buffer;
 
 		udp.close();
 	}
@@ -247,46 +253,55 @@ public:
 	static int read(void *opaque, unsigned char *buf, int buf_size) {
 		MyTelloUdpAVIOContext* h = static_cast<MyTelloUdpAVIOContext*>(opaque);
 
-		// TODO  should build a complete I frame.
-
-		if (buf_size + 2 > h->buffer2_size) {
-			if (h->buffer2 != nullptr)
-				delete[]  h->buffer2;
-			h->buffer2_size = buf_size + 2;
-			h->buffer2 = new char[h->buffer2_size];
-		}
-		int read_size = h->udp.read(h->buffer2, h->buffer2_size);
-		if (read_size <= 0) {
+		int read_size = h->udp.read(h->udp_recieve_buffer, UDP_RECIEVE_BUFFER_SIZE);
+		if (read_size < 2)
 			return 0;
-		}
-// TODO
-		uint8_t b0 = (uint8_t)h->buffer2[0];
-		uint8_t b1 = (uint8_t)h->buffer2[1];
 
+		uint8_t* ub = reinterpret_cast<uint8_t*>(h->udp_recieve_buffer);
+		uint8_t b0 = ub[0];
+		uint8_t b1 = ub[1];
+		bool isLastFragment = false;
 		{
 			stringstream ss;
 			ss << "buf_size: " << buf_size << ", read_size:" << read_size << " [0]:" << (int)b0 << " [1]:" << (int)b1;
+			isLastFragment = b1 > 130;
 			debug_log(ss.str().c_str());
 		}
 
-		if (read_size >= 6 && h->buffer2[2] == 0 && h->buffer2[3] == 0 && h->buffer2[4] == 0 && h->buffer2[5] == 1) {
+		// skip the header
+		ub += 2;
+		read_size -= 2;
+#if 0
+		int filled = -1;
+		if (read_size >= 6 && ub[0] == 0 && ub[1] == 0 && ub[2] == 0 && ub[3] == 1) {
 			debug_log("NAL");
 			h->fragment_index = 0;
+			memcpy(h->i_frame_buffer, ub, read_size);
+			h->i_frame_buffer_filled_size = read_size;
 		}
 		else {
+			uint8_t* dst = h->i_frame_buffer + h->i_frame_buffer_filled_size;
+			memcpy(dst, ub, read_size);
+			h->i_frame_buffer_filled_size += read_size;
 			h->fragment_index++;
+			if (isLastFragment) {
+				filled = min<int>(buf_size, h->i_frame_buffer_filled_size);
+				memcpy(buf, h->i_frame_buffer, filled);
+			}
 		}
 
 		{
 			stringstream ss;
-			ss << "fragment_index: " << h->fragment_index;
+			ss << "fragment_index: " << h->fragment_index << " filled: " << filled;
 			debug_log(ss.str().c_str());
 		}
 
-		read_size -= 2;
-		memcpy(buf, h->buffer2 + 2, read_size);
 
+		return filled;
+#else
+		memcpy(buf, ub, read_size);
 		return read_size;
+#endif
 	}
 
 	AVIOContext* get() { return avio_ctx; }
@@ -297,9 +312,13 @@ private:
 	AVIOContext * avio_ctx;
 	MyUdpClient udp;
 
-	char* buffer2;
-	int buffer2_size;
+	uint8_t* i_frame_buffer;
+	int i_frame_buffer_filled_size;
 	int fragment_index;
+
+	char* udp_recieve_buffer;
+	static const int UDP_RECIEVE_BUFFER_SIZE = 1500;
+
 };
 
 class MyVideoDecoder {
@@ -340,12 +359,14 @@ public:
 
 						// Flip
 						int linesz = frame_rgba->linesize[0];
-						if (rgbaLineBuffer == nullptr)
-							rgbaLineBuffer = new uint8_t[linesz];
-						else if (rgbaLineBufferSize < linesz) {
+						if (rgbaLineBuffer == nullptr) {
 							rgbaLineBufferSize = linesz;
+							rgbaLineBuffer = new uint8_t[rgbaLineBufferSize];
+						}
+						else if (rgbaLineBufferSize < linesz) {
 							delete[] rgbaLineBuffer;
-							rgbaLineBuffer = new uint8_t[linesz];
+							rgbaLineBufferSize = linesz;
+							rgbaLineBuffer = new uint8_t[rgbaLineBufferSize];
 						}
 
 						uint8_t* plineU = frame_rgba->data[0];
@@ -557,7 +578,9 @@ extern "C" {
 		MyVideoDecoder decoder;
 		while (ctx->isRunning_) {
 			decoder.run(ctx->imageBuffer_, ctx->imageBufferSize, &ctx->mutex_, &ctx->isRunning_);
-			this_thread::yield();
+			//this_thread::yield();
+			this_thread::sleep_for(std::chrono::seconds(1));
+
 		}
 	}
 
