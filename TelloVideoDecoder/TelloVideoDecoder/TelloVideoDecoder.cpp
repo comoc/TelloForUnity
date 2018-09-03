@@ -219,7 +219,7 @@ private:
 class MyTelloUdpAVIOContext
 {
 public:
-	MyTelloUdpAVIOContext(const char* address, int port, bool* isRunning)
+	MyTelloUdpAVIOContext(int port, bool* isRunning)
 		: avio_ctx(nullptr)
 		, udp(isRunning)
 		, i_frame_buffer(nullptr)
@@ -406,7 +406,7 @@ public:
 private:
 	bool open(bool* isRunning) {
 
-		avioContext = new MyTelloUdpAVIOContext(TELLO_ADDRESS.c_str(), TELLO_VIDEO_PORT, isRunning);
+		avioContext = new MyTelloUdpAVIOContext(TELLO_VIDEO_PORT, isRunning);
 		fmt_ctx = avformat_alloc_context();
 		fmt_ctx->pb = avioContext->get();
 
@@ -425,8 +425,6 @@ private:
 			close();
 			return false;
 		}
-
-		av_dump_format(fmt_ctx, 0, TELLO_ADDRESS.c_str(), 0);
 
 		// decode
 		for (int i = 0; i < (int)fmt_ctx->nb_streams; ++i) {
@@ -541,7 +539,6 @@ private:
 		}
 	}
 private:
-	static const string TELLO_ADDRESS;
 	static const int TELLO_VIDEO_PORT;
 
 	MyTelloUdpAVIOContext* avioContext;
@@ -560,7 +557,6 @@ private:
 
 };
 
-const string MyVideoDecoder::TELLO_ADDRESS("192.168.0.1");
 const int MyVideoDecoder::TELLO_VIDEO_PORT(6038);
 
 extern "C" {
@@ -580,7 +576,6 @@ extern "C" {
 			decoder.run(ctx->imageBuffer_, ctx->imageBufferSize, &ctx->mutex_, &ctx->isRunning_);
 			//this_thread::yield();
 			this_thread::sleep_for(std::chrono::seconds(1));
-
 		}
 	}
 
