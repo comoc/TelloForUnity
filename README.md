@@ -1,18 +1,26 @@
 # TelloForUnity
 
-DJI Tello application development resources for Unity.
+A Ryze Tech/DJI Tello application development resources for Unity.
 
 ## Note
 
 This project is including the following modules.
-* Modified source code of [TelloLib](https://github.com/Kragrathea/TelloLib)
+
+* Forked and modified source code of [TelloLib](https://github.com/comoc/TelloLib). The original version is [Kagrathea's TelloLib](https://github.com/Kragrathea/TelloLib).
 * Modified source code of [NativeRenderingPlugin](https://bitbucket.org/Unity-Technologies/graphicsdemos/src/default/NativeRenderingPlugin/)
 * Pre-built DLLs for Windows 64 bit of [FFmpeg](https://www.ffmpeg.org/)
 
 At this time, Windows 64 bit and macOS 64 bit version only.
 
-
 ## Installation
+
+### Clone
+
+```
+git clone https://github.com/comoc/TelloForUnity
+cd TelloForUnity
+git submodule update --init --recursive
+```
 
 ### Windows Specific Settings
 
@@ -27,7 +35,7 @@ Please confirm the Windows Firewall settings of your Unity Editor. Public networ
 ## Basic Usage
 
 * Open the TelloUnityDemo project into Unity Editor.
-* Edit > Project Settings > Player > Other Settings > "Scripting Runtime Version" as ".NET 4.x Equiverent".
+* Edit > Project Settings > Player > Other Settings > "Scripting Runtime Version" as ".NET 4.x Equivalent".
 * Open the Scenes/Master scene.
 * Connect to Tello Wi-Fi.
 * Play.
