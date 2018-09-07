@@ -1,0 +1,3 @@
+[submodule "TelloUnityDemo/Assets/Scripts/TelloLib"]
+	path = TelloUnityDemo/Assets/Scripts/TelloLib
+	url = git@github.com:comoc/TelloLib.git
