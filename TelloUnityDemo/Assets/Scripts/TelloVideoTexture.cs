@@ -39,6 +39,13 @@ public class TelloVideoTexture : MonoBehaviour {
 #endif
 	private static extern void UnityPluginDisable();
 
+#if (UNITY_IPHONE || UNITY_WEBGL) && !UNITY_EDITOR
+	[DllImport ("__Internal")]
+#else
+	[DllImport("TelloVideoDecoder")]
+#endif
+	private static extern void PutVideoDataFromUnity(IntPtr data, int size);
+
 	private const int Width = 1280;
 	private const int Height = 720;
 	private const TextureFormat TextureFormat_ = TextureFormat.RGBA32;
@@ -78,5 +85,13 @@ public class TelloVideoTexture : MonoBehaviour {
 			yield return new WaitForEndOfFrame();
 			GL.IssuePluginEvent(GetRenderEventFunc(), 1);
 		}
+	}
+
+	public void PutVideoData(byte[] data)
+	{
+		IntPtr unmanagedData = Marshal.AllocHGlobal(data.Length);
+		Marshal.Copy(data, 0, unmanagedData, data.Length);
+		PutVideoDataFromUnity((IntPtr)unmanagedData, data.Length);
+		Marshal.FreeHGlobal(unmanagedData);
 	}
 }

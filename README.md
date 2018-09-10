@@ -10,7 +10,7 @@ This project is including the following modules.
 * Modified source code of [NativeRenderingPlugin](https://bitbucket.org/Unity-Technologies/graphicsdemos/src/default/NativeRenderingPlugin/)
 * Pre-built DLLs for Windows 64 bit of [FFmpeg](https://www.ffmpeg.org/)
 
-At this time, Windows 64 bit and macOS 64 bit version only.
+At this time, Windows 64 bit ~~and macOS 64 bit~~ version only. (macOS version is in preparation)
 
 ## Installation
 

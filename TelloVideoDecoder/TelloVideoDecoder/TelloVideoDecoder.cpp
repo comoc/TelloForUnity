@@ -4,10 +4,12 @@
 
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
 #include <mutex>
+#include <queue>
 #include <string>
 #include <sstream>
 #include <thread>
@@ -87,265 +89,42 @@ namespace {
 #endif
 }
 
-class MyUdpClient
-{
-public:
-	MyUdpClient(bool* isRunning)
-		:
-#ifdef UNITY_WIN
-		sock(INVALID_SOCKET)
-#else
-		sock(-1)
-#endif
-		, isRunning(isRunning)
-	{
-	}
-
-	~MyUdpClient()
-	{
-		close();
-	}
-
-	bool open(int port)
-	{
-		sock = socket(AF_INET, SOCK_DGRAM, 0);
-#ifdef UNITY_WIN
-		if (sock != INVALID_SOCKET) {
-#else
-		if (sock != -1) {
-#endif
-			sockaddr_in addr;
-			memset(&addr, 0, sizeof(addr));
-			addr.sin_family = AF_INET;
-			addr.sin_port = htons(port);
-			addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-			int status = ::bind(sock, (sockaddr*)&addr, sizeof(addr));
-#ifdef UNITY_WIN
-			if (status != SOCKET_ERROR) {
-				u_long val = 1;
-				ioctlsocket(sock, FIONBIO, &val);
-				return true;
-			}
-			else {
-				closesocket(sock);
-				sock = INVALID_SOCKET;
-			}
-#else
-			if (status != -1) {
-				int val = 1;
-				ioctl(sock, FIONBIO, &val);
-				return true;
-			}
-			else {
-				::close(sock);
-				sock = -1;
-			}
-#endif
-		}
-		return false;
-	}
-
-	void close()
-	{
-#ifdef UNITY_WIN
-		if (sock != INVALID_SOCKET) {
-			closesocket(sock);
-			sock = INVALID_SOCKET;
-		}
-#else
-		if (sock != -1) {
-			::close(sock);
-			sock = -1;
-		}
-#endif
-	}
-
-	int read(char* buffer, int buffer_size)
-	{
-#ifdef UNITY_WIN
-		if (sock == INVALID_SOCKET)
-#else
-		if (sock == -1)
-#endif
-			return -1;
-
-		// TODO
-#if 0//def UNITY_ANDROID
-		fd_set fds;
-		FD_ZERO(&fds);
-		FD_SET(sock, &fds);
-		select(sock+1, &fds, NULL, NULL, NULL);
-		if (FD_ISSET(sock, &fds) == 0) {
-			return 0;
-		}
-#endif
-
-		int read_size = -1;
-		while (*isRunning) {
-
-			read_size = static_cast<int>(recv(sock, buffer, static_cast<size_t>(buffer_size), 0));
-			if (read_size < 1) {
-#ifdef UNITY_WIN
-				if (WSAGetLastError() == WSAEWOULDBLOCK) {
-					this_thread::yield();
-#else
-				if (errno == EAGAIN) {
-					this_thread::yield();
-					// this_thread::sleep_for(std::chrono::milliseconds(5));
-#endif
-					continue;
-				}
-				else {
-					break;
-				}
-			}
-			else {
-				break;
-			}
-		}
-
-		return read_size;
-	}
-private:
-#ifdef UNITY_WIN
-	SOCKET sock;
-#else
-	int sock;
-#endif
-	bool* isRunning;
-};
-
-class MyTelloUdpAVIOContext
-{
-public:
-	MyTelloUdpAVIOContext(int port, bool* isRunning)
-		: avio_ctx(nullptr)
-		, udp(isRunning)
-		, i_frame_buffer(nullptr)
-		, i_frame_buffer_filled_size(0)
-		, fragment_index(0)
-		, udp_recieve_buffer(nullptr) {
-		//avformat_network_init(); // not necessary
-
-		buffer = static_cast<unsigned char*>(av_malloc(BUFFER_SIZE));
-		i_frame_buffer = new uint8_t[BUFFER_SIZE];
-		udp_recieve_buffer = new char[UDP_RECIEVE_BUFFER_SIZE];
-		avio_ctx = avio_alloc_context(buffer, BUFFER_SIZE, 0, this, &MyTelloUdpAVIOContext::read, nullptr, nullptr);
-
-		if (!udp.open(port)) {
-			debug_log("UDP open failed");
-		}
-	}
-
-	~MyTelloUdpAVIOContext() {
-		av_freep(&avio_ctx->buffer);
-		av_freep(&avio_ctx);
-		if (i_frame_buffer != nullptr)
-			delete[] i_frame_buffer;
-
-		if (udp_recieve_buffer != nullptr)
-			delete[] udp_recieve_buffer;
-
-		udp.close();
-	}
-
-	static int read(void *opaque, unsigned char *buf, int buf_size) {
-		MyTelloUdpAVIOContext* h = static_cast<MyTelloUdpAVIOContext*>(opaque);
-
-		int read_size = h->udp.read(h->udp_recieve_buffer, UDP_RECIEVE_BUFFER_SIZE);
-		if (read_size < 2)
-			return 0;
-
-		uint8_t* ub = reinterpret_cast<uint8_t*>(h->udp_recieve_buffer);
-		uint8_t b0 = ub[0];
-		uint8_t b1 = ub[1];
-		bool isLastFragment = false;
-		{
-			stringstream ss;
-			ss << "buf_size: " << buf_size << ", read_size:" << read_size << " [0]:" << (int)b0 << " [1]:" << (int)b1;
-			isLastFragment = b1 > 130;
-			debug_log(ss.str().c_str());
-		}
-
-		// skip the header
-		ub += 2;
-		read_size -= 2;
-#if 0
-		int filled = -1;
-		if (read_size >= 6 && ub[0] == 0 && ub[1] == 0 && ub[2] == 0 && ub[3] == 1) {
-			debug_log("NAL");
-			h->fragment_index = 0;
-			memcpy(h->i_frame_buffer, ub, read_size);
-			h->i_frame_buffer_filled_size = read_size;
-		}
-		else {
-			uint8_t* dst = h->i_frame_buffer + h->i_frame_buffer_filled_size;
-			memcpy(dst, ub, read_size);
-			h->i_frame_buffer_filled_size += read_size;
-			h->fragment_index++;
-			if (isLastFragment) {
-				filled = min<int>(buf_size, h->i_frame_buffer_filled_size);
-				memcpy(buf, h->i_frame_buffer, filled);
-			}
-		}
-
-		{
-			stringstream ss;
-			ss << "fragment_index: " << h->fragment_index << " filled: " << filled;
-			debug_log(ss.str().c_str());
-		}
-
-
-		return filled;
-#else
-		memcpy(buf, ub, read_size);
-		return read_size;
-#endif
-	}
-
-	AVIOContext* get() { return avio_ctx; }
-
-private:
-	static const int BUFFER_SIZE = IMAGE_SIZE_IN_BYTES;
-	unsigned char* buffer;
-	AVIOContext * avio_ctx;
-	MyUdpClient udp;
-
-	uint8_t* i_frame_buffer;
-	int i_frame_buffer_filled_size;
-	int fragment_index;
-
-	char* udp_recieve_buffer;
-	static const int UDP_RECIEVE_BUFFER_SIZE = 1500;
-
-};
-
 class MyVideoDecoder {
 public:
 	MyVideoDecoder() :
-		avioContext(nullptr),
+		mtx(nullptr),
+		cond(nullptr),
+		isRunning(nullptr),
+		avio_ctx(nullptr),
 		fmt_ctx(nullptr),
 		video_stream(nullptr),
 		codec(nullptr),
 		codec_context(nullptr),
 		frame(nullptr) {
-
 	}
 	~MyVideoDecoder() {
 	}
 
 public:
-	bool run(uint8_t* destination, size_t size, mutex* mtx, bool* isRunning) {
-
-		if (!open(isRunning))
+	bool run(uint8_t* destination, size_t size, mutex* mtx, condition_variable* cond, bool* isRunning) {
+		if (!open(mtx, cond, isRunning))
 			return false;
 
 		uint8_t* rgbaLineBuffer = nullptr;
 		int rgbaLineBufferSize = 0;
 
 		// Read frame
-		while ((*isRunning) && av_read_frame(fmt_ctx, &packet) == 0) {
+		while (true) {
+			{
+				lock_guard<mutex> lock(*mtx);
+				if ((!*isRunning))
+					break;
+			}
+			if (av_read_frame(fmt_ctx, &packet) < 0) {
+				this_thread::yield();
+				continue;
+			}
+
 			if (packet.stream_index == video_stream->index) {
 				if (avcodec_send_packet(codec_context, &packet) != 0) {
 					debug_log("avcodec_send_packet failed\n");
@@ -403,12 +182,63 @@ public:
 		return true;
 	}
 
-private:
-	bool open(bool* isRunning) {
+	void putVideoData(uint8_t* data, int size) {
+		if (fragmentQueue.size() < MAX_FRAGMENT_COUNT) {
+			fragmentQueue.push(new Fragment(data, size));
+		}
+	}
 
-		avioContext = new MyTelloUdpAVIOContext(TELLO_VIDEO_PORT, isRunning);
+	static int read(void *opaque, unsigned char *buf, int buf_size) {
+		MyVideoDecoder* h = static_cast<MyVideoDecoder*>(opaque);
+
+		chrono::steady_clock::time_point start = chrono::steady_clock::now();
+		while (true) {
+			{
+				lock_guard<mutex> lock(*h->mtx);
+				if ((!*h->isRunning))
+					break;
+			}
+
+			if (!h->fragmentQueue.empty()) {
+				lock_guard<mutex> lock(*h->mtx);
+				Fragment* f = h->fragmentQueue.front();
+				int size = min<int>(f->size, buf_size);
+				if (size > 2) {
+
+					stringstream ss;
+					ss << "VideoData data[0]: " << (int)f->buffer[0] << " data[1]: " << (int)f->buffer[1];
+					debug_log(ss.str().c_str());
+
+					size -= 2;
+					memcpy(buf, f->buffer + 2, size);
+				}
+				h->fragmentQueue.pop();
+				delete f;
+				return size;
+			}
+			else {
+				unique_lock<mutex> lock(*h->mtx);
+				cv_status result = h->cond->wait_for(lock, chrono::seconds(1));
+				if (result == std::cv_status::timeout) {
+					debug_log("timeout");
+					break;
+				}
+			}
+		}
+		return 0;
+	}
+
+private:
+	bool open(mutex* mtx, condition_variable* cond, bool* isRunning) {
+		this->mtx = mtx;
+		this->cond = cond;
+		this->isRunning = isRunning;
+
+		unsigned char* avio_buffer = static_cast<unsigned char*>(av_malloc(BUFFER_SIZE));
+		avio_ctx = avio_alloc_context(avio_buffer, BUFFER_SIZE, 0, this, &MyVideoDecoder::read, nullptr, nullptr);
+
 		fmt_ctx = avformat_alloc_context();
-		fmt_ctx->pb = avioContext->get();
+		fmt_ctx->pb = avio_ctx;
 
 		/// using ctx
 		int ret;
@@ -533,15 +363,52 @@ private:
 			fmt_ctx = nullptr;
 		}
 
-		if (avioContext != nullptr) {
-			delete avioContext;
-			avioContext = nullptr;
+		if (avio_ctx != nullptr) {
+			av_freep(&avio_ctx->buffer);
+			av_freep(&avio_ctx);
+			avio_ctx = nullptr;
 		}
+
+		{
+			lock_guard<mutex> lock(*mtx);
+			while (!fragmentQueue.empty()) {
+				Fragment* f = fragmentQueue.front();
+				delete f;
+				fragmentQueue.pop();
+			}
+		}
+		mtx = nullptr;
+		cond = nullptr;
+		isRunning = nullptr;
 	}
 private:
-	static const int TELLO_VIDEO_PORT;
+	static const int BUFFER_SIZE = IMAGE_SIZE_IN_BYTES;
+	static const int MAX_FRAGMENT_COUNT = 16;
 
-	MyTelloUdpAVIOContext* avioContext;
+	mutex* mtx;
+	condition_variable* cond;
+	bool* isRunning;
+
+	AVIOContext* avio_ctx;
+	class Fragment {
+	public:
+		uint8_t* buffer;
+		int size;
+		Fragment(uint8_t* buf, int sz) {
+			size = sz;
+			buffer = new uint8_t[size];
+			memcpy(buffer, buf, size);
+		}
+		~Fragment() {
+			delete[] buffer;
+		}
+	private:
+		Fragment() = delete;
+		Fragment(const Fragment&) = delete;
+		Fragment& operator=(const Fragment&) = delete;
+	};
+	queue<Fragment*> fragmentQueue;
+
 	AVFormatContext* fmt_ctx;
 	AVStream* video_stream;
 	AVCodec* codec;
@@ -557,8 +424,6 @@ private:
 
 };
 
-const int MyVideoDecoder::TELLO_VIDEO_PORT(6038);
-
 extern "C" {
 
 	struct TelloVideoDecoderContext {
@@ -567,15 +432,25 @@ extern "C" {
 		size_t imageBufferSize = 0;
 		thread* thread_ = nullptr;
 		mutex mutex_;
+		condition_variable condition_;
+		MyVideoDecoder* decoder;
 	};
 
-	void decode(TelloVideoDecoderContext* ctx)
+	void Decode(TelloVideoDecoderContext* ctx)
 	{
 		MyVideoDecoder decoder;
+		{
+			lock_guard<mutex> lock(ctx->mutex_);
+			ctx->decoder = &decoder;
+		}
 		while (ctx->isRunning_) {
-			decoder.run(ctx->imageBuffer_, ctx->imageBufferSize, &ctx->mutex_, &ctx->isRunning_);
+			decoder.run(ctx->imageBuffer_, ctx->imageBufferSize, &ctx->mutex_, &ctx->condition_, &ctx->isRunning_);
 			//this_thread::yield();
-			this_thread::sleep_for(std::chrono::seconds(1));
+			this_thread::sleep_for(chrono::seconds(1));
+		}
+		{
+			lock_guard<mutex> lock(ctx->mutex_);
+			ctx->decoder = nullptr;
 		}
 	}
 
@@ -588,7 +463,7 @@ extern "C" {
 		memset(ctx->imageBuffer_, 0x80, ctx->imageBufferSize);
 
 		ctx->isRunning_ = true;
-		ctx->thread_ = new thread(decode, ctx);
+		ctx->thread_ = new thread(Decode, ctx);
 
 		return ctx;
 	}
@@ -596,6 +471,7 @@ extern "C" {
 	void TelloVideoDecoder_Close(TelloVideoDecoderContext* ctx)
 	{
 		ctx->isRunning_ = false;
+		ctx->condition_.notify_all();
 
 		if (ctx->thread_ != nullptr) {
 			if (ctx->thread_->joinable()) {
@@ -627,5 +503,16 @@ extern "C" {
 				memcpy(data, ctx->imageBuffer_, size);
 		}
 		//debug_log("TelloVideoDecoder_ModifyTexturePixels end");
+	}
+
+	void TelloVideoDecoder_PutVideoData(TelloVideoDecoderContext* ctx, void* data, int size) {
+		if (ctx != nullptr) {
+			lock_guard<mutex> lock(ctx->mutex_);
+			if (size > 2 && ctx->decoder != nullptr) {
+				uint8_t* p = static_cast<uint8_t*>(data);
+				ctx->decoder->putVideoData(p, size);
+				ctx->condition_.notify_all();
+			}
+		}
 	}
 }

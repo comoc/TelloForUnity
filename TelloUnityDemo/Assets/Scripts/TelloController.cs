@@ -11,10 +11,9 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
 
 	private static bool isLoaded = false;
 
-	private byte[] encodedDataPool;
-	private int encodedDataFilled = 0;
+	private TelloVideoTexture telloVideoTexture;
 
-			// FlipType is used for the various flips supported by the Tello.
+	// FlipType is used for the various flips supported by the Tello.
 	public enum FlipType
 	{
 
@@ -78,13 +77,22 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
 		Tello.onUpdate += Tello_onUpdate;
 		Tello.onVideoData += Tello_onVideoData;
 
+		if (telloVideoTexture == null)
+			telloVideoTexture = FindObjectOfType<TelloVideoTexture>();
 
-		encodedDataPool = new byte[1280 * 720 * 3];
+	}
 
+	private void OnEnable()
+	{
+		if (telloVideoTexture == null)
+			telloVideoTexture = FindObjectOfType<TelloVideoTexture>();
 	}
 
 	private void Start()
 	{
+		if (telloVideoTexture == null)
+			telloVideoTexture = FindObjectOfType<TelloVideoTexture>();
+
 		Tello.startConnecting();
 	}
 
@@ -158,10 +166,9 @@ public class TelloController : SingletonMonoBehaviour<TelloController> {
 
 	private void Tello_onVideoData(byte[] data)
 	{
-		Debug.Log("Tello_onVideoData: " + data.Length);
-		int length = data.Length - 2;
-		Buffer.BlockCopy(data, 2, encodedDataPool, encodedDataFilled, length);
-		encodedDataFilled += length;
+		//Debug.Log("Tello_onVideoData: " + data.Length);
+		if (telloVideoTexture != null)
+			telloVideoTexture.PutVideoData(data);
 	}
 
 }

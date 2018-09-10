@@ -22,6 +22,7 @@ extern "C"
 	TelloVideoDecoderContext* TelloVideoDecoder_Open();
 	void TelloVideoDecoder_Close(TelloVideoDecoderContext* ctx);
 	void TelloVideoDecoder_ModifyTexturePixels(TelloVideoDecoderContext* ctx, void* data, int width, int height, int rowPitch);
+	void TelloVideoDecoder_PutVideoData(TelloVideoDecoderContext* ctx, void* data, int size);
 }
 
 
@@ -42,7 +43,6 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetTextureFromUnity(v
 	g_TextureWidth = w;
 	g_TextureHeight = h;
 }
-
 
 // --------------------------------------------------------------------------
 // UnitySetInterfaces
@@ -160,4 +160,10 @@ extern "C" UnityRenderingEvent UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRen
 {
 	return OnRenderEvent;
 }
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API PutVideoDataFromUnity(void* data, int size)
+{
+	TelloVideoDecoder_PutVideoData(s_TelloContext, data, size);
+}
+
 
