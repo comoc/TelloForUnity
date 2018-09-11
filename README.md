@@ -17,7 +17,7 @@ At this time, Windows 64 bit ~~and macOS 64 bit~~ version only. (macOS version i
 ### Clone
 
 ```
-git clone https://github.com/comoc/TelloForUnity
+git clone https://github.com/comoc/TelloForUnity.git
 cd TelloForUnity
 git submodule update --init --recursive
 ```
