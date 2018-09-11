@@ -1,0 +1,420 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FD58515220D00AB400E47889 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD58515120D00AB400E47889 /* OpenGL.framework */; };
+		FD58515420D00AC400E47889 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD58515320D00AC400E47889 /* CoreFoundation.framework */; };
+		FD58515D20D00F2A00E47889 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD58515820D00F2900E47889 /* libavcodec.a */; };
+		FD58515E20D00F2A00E47889 /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD58515920D00F2900E47889 /* libavutil.a */; };
+		FD58515F20D00F2A00E47889 /* libx264.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD58515A20D00F2900E47889 /* libx264.a */; };
+		FD58516020D00F2A00E47889 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD58515B20D00F2900E47889 /* libavformat.a */; };
+		FD58516120D00F2A00E47889 /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD58515C20D00F2A00E47889 /* libswresample.a */; };
+		FD58516320D00F6E00E47889 /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD58516220D00F6E00E47889 /* libswscale.a */; };
+		FD6DE9E52147B11C0037E08D /* glew.c in Sources */ = {isa = PBXBuildFile; fileRef = FD6DE9E22147B11B0037E08D /* glew.c */; };
+		FD6DE9F12147B13B0037E08D /* RenderAPI_D3D11.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD6DE9E62147B13A0037E08D /* RenderAPI_D3D11.cpp */; };
+		FD6DE9F22147B13B0037E08D /* RenderAPI_OpenGL2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD6DE9E92147B13A0037E08D /* RenderAPI_OpenGL2.cpp */; };
+		FD6DE9F32147B13B0037E08D /* RenderAPI_Metal.mm in Sources */ = {isa = PBXBuildFile; fileRef = FD6DE9EA2147B13A0037E08D /* RenderAPI_Metal.mm */; };
+		FD6DE9F52147B13B0037E08D /* RenderAPI_OpenGLCoreES.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD6DE9EC2147B13A0037E08D /* RenderAPI_OpenGLCoreES.cpp */; };
+		FD6DE9F62147B13B0037E08D /* RenderingPlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD6DE9ED2147B13B0037E08D /* RenderingPlugin.cpp */; };
+		FD6DE9F72147B13B0037E08D /* TelloVideoDecoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD6DE9EE2147B13B0037E08D /* TelloVideoDecoder.cpp */; };
+		FD6DE9F82147B13B0037E08D /* RenderAPI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD6DE9EF2147B13B0037E08D /* RenderAPI.cpp */; };
+		FD6DE9F92147B13B0037E08D /* RenderAPI_D3D12.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FD6DE9F02147B13B0037E08D /* RenderAPI_D3D12.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		FD58512320D008FD00E47889 /* TelloVideoDecoder.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TelloVideoDecoder.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		FD58515120D00AB400E47889 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		FD58515320D00AC400E47889 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		FD58515520D00AE600E47889 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = TelloVideoDecoder/Info.plist; sourceTree = "<group>"; };
+		FD58515820D00F2900E47889 /* libavcodec.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavcodec.a; path = ../../../../../../usr/local/Cellar/ffmpeg/4.0/lib/libavcodec.a; sourceTree = "<group>"; };
+		FD58515920D00F2900E47889 /* libavutil.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavutil.a; path = ../../../../../../usr/local/Cellar/ffmpeg/4.0/lib/libavutil.a; sourceTree = "<group>"; };
+		FD58515A20D00F2900E47889 /* libx264.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libx264.a; path = ../../../../../../usr/local/Cellar/x264/r2854/lib/libx264.a; sourceTree = "<group>"; };
+		FD58515B20D00F2900E47889 /* libavformat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavformat.a; path = ../../../../../../usr/local/Cellar/ffmpeg/4.0/lib/libavformat.a; sourceTree = "<group>"; };
+		FD58515C20D00F2A00E47889 /* libswresample.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libswresample.a; path = ../../../../../../usr/local/Cellar/ffmpeg/4.0/lib/libswresample.a; sourceTree = "<group>"; };
+		FD58516220D00F6E00E47889 /* libswscale.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libswscale.a; path = ../../../../../../usr/local/Cellar/ffmpeg/4.0/lib/libswscale.a; sourceTree = "<group>"; };
+		FD6DE9DA2147B1090037E08D /* IUnityInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityInterface.h; sourceTree = "<group>"; };
+		FD6DE9DB2147B1090037E08D /* IUnityGraphicsD3D9.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityGraphicsD3D9.h; sourceTree = "<group>"; };
+		FD6DE9DC2147B1090037E08D /* IUnityGraphicsD3D12.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityGraphicsD3D12.h; sourceTree = "<group>"; };
+		FD6DE9DD2147B1090037E08D /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityGraphics.h; sourceTree = "<group>"; };
+		FD6DE9DE2147B1090037E08D /* IUnityGraphicsMetal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityGraphicsMetal.h; sourceTree = "<group>"; };
+		FD6DE9DF2147B1090037E08D /* IUnityGraphicsD3D11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityGraphicsD3D11.h; sourceTree = "<group>"; };
+		FD6DE9E12147B11B0037E08D /* glxew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glxew.h; sourceTree = "<group>"; };
+		FD6DE9E22147B11B0037E08D /* glew.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = glew.c; sourceTree = "<group>"; };
+		FD6DE9E32147B11B0037E08D /* wglew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wglew.h; sourceTree = "<group>"; };
+		FD6DE9E42147B11B0037E08D /* glew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glew.h; sourceTree = "<group>"; };
+		FD6DE9E62147B13A0037E08D /* RenderAPI_D3D11.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderAPI_D3D11.cpp; path = TelloVideoDecoder/RenderAPI_D3D11.cpp; sourceTree = "<group>"; };
+		FD6DE9E72147B13A0037E08D /* PlatformBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlatformBase.h; path = TelloVideoDecoder/PlatformBase.h; sourceTree = "<group>"; };
+		FD6DE9E82147B13A0037E08D /* RenderAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderAPI.h; path = TelloVideoDecoder/RenderAPI.h; sourceTree = "<group>"; };
+		FD6DE9E92147B13A0037E08D /* RenderAPI_OpenGL2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderAPI_OpenGL2.cpp; path = TelloVideoDecoder/RenderAPI_OpenGL2.cpp; sourceTree = "<group>"; };
+		FD6DE9EA2147B13A0037E08D /* RenderAPI_Metal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RenderAPI_Metal.mm; path = TelloVideoDecoder/RenderAPI_Metal.mm; sourceTree = "<group>"; };
+		FD6DE9EC2147B13A0037E08D /* RenderAPI_OpenGLCoreES.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderAPI_OpenGLCoreES.cpp; path = TelloVideoDecoder/RenderAPI_OpenGLCoreES.cpp; sourceTree = "<group>"; };
+		FD6DE9ED2147B13B0037E08D /* RenderingPlugin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderingPlugin.cpp; path = TelloVideoDecoder/RenderingPlugin.cpp; sourceTree = "<group>"; };
+		FD6DE9EE2147B13B0037E08D /* TelloVideoDecoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TelloVideoDecoder.cpp; path = TelloVideoDecoder/TelloVideoDecoder.cpp; sourceTree = "<group>"; };
+		FD6DE9EF2147B13B0037E08D /* RenderAPI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderAPI.cpp; path = TelloVideoDecoder/RenderAPI.cpp; sourceTree = "<group>"; };
+		FD6DE9F02147B13B0037E08D /* RenderAPI_D3D12.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderAPI_D3D12.cpp; path = TelloVideoDecoder/RenderAPI_D3D12.cpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FD58512020D008FD00E47889 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FD58516320D00F6E00E47889 /* libswscale.a in Frameworks */,
+				FD58516120D00F2A00E47889 /* libswresample.a in Frameworks */,
+				FD58515D20D00F2A00E47889 /* libavcodec.a in Frameworks */,
+				FD58515E20D00F2A00E47889 /* libavutil.a in Frameworks */,
+				FD58515F20D00F2A00E47889 /* libx264.a in Frameworks */,
+				FD58516020D00F2A00E47889 /* libavformat.a in Frameworks */,
+				FD58515420D00AC400E47889 /* CoreFoundation.framework in Frameworks */,
+				FD58515220D00AB400E47889 /* OpenGL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FD58511A20D008FD00E47889 = {
+			isa = PBXGroup;
+			children = (
+				FD6DE9E72147B13A0037E08D /* PlatformBase.h */,
+				FD6DE9E62147B13A0037E08D /* RenderAPI_D3D11.cpp */,
+				FD6DE9F02147B13B0037E08D /* RenderAPI_D3D12.cpp */,
+				FD6DE9EA2147B13A0037E08D /* RenderAPI_Metal.mm */,
+				FD6DE9E92147B13A0037E08D /* RenderAPI_OpenGL2.cpp */,
+				FD6DE9EC2147B13A0037E08D /* RenderAPI_OpenGLCoreES.cpp */,
+				FD6DE9EF2147B13B0037E08D /* RenderAPI.cpp */,
+				FD6DE9E82147B13A0037E08D /* RenderAPI.h */,
+				FD6DE9ED2147B13B0037E08D /* RenderingPlugin.cpp */,
+				FD6DE9EE2147B13B0037E08D /* TelloVideoDecoder.cpp */,
+				FD6DE9E02147B11B0037E08D /* GLEW */,
+				FD6DE9D92147B1090037E08D /* Unity */,
+				FD58515520D00AE600E47889 /* Info.plist */,
+				FD58512420D008FD00E47889 /* Products */,
+				FD58515020D00AB400E47889 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		FD58512420D008FD00E47889 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FD58512320D008FD00E47889 /* TelloVideoDecoder.bundle */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FD58515020D00AB400E47889 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FD58516220D00F6E00E47889 /* libswscale.a */,
+				FD58515820D00F2900E47889 /* libavcodec.a */,
+				FD58515B20D00F2900E47889 /* libavformat.a */,
+				FD58515920D00F2900E47889 /* libavutil.a */,
+				FD58515C20D00F2A00E47889 /* libswresample.a */,
+				FD58515A20D00F2900E47889 /* libx264.a */,
+				FD58515320D00AC400E47889 /* CoreFoundation.framework */,
+				FD58515120D00AB400E47889 /* OpenGL.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		FD6DE9D92147B1090037E08D /* Unity */ = {
+			isa = PBXGroup;
+			children = (
+				FD6DE9DA2147B1090037E08D /* IUnityInterface.h */,
+				FD6DE9DB2147B1090037E08D /* IUnityGraphicsD3D9.h */,
+				FD6DE9DC2147B1090037E08D /* IUnityGraphicsD3D12.h */,
+				FD6DE9DD2147B1090037E08D /* IUnityGraphics.h */,
+				FD6DE9DE2147B1090037E08D /* IUnityGraphicsMetal.h */,
+				FD6DE9DF2147B1090037E08D /* IUnityGraphicsD3D11.h */,
+			);
+			name = Unity;
+			path = TelloVideoDecoder/Unity;
+			sourceTree = "<group>";
+		};
+		FD6DE9E02147B11B0037E08D /* GLEW */ = {
+			isa = PBXGroup;
+			children = (
+				FD6DE9E12147B11B0037E08D /* glxew.h */,
+				FD6DE9E22147B11B0037E08D /* glew.c */,
+				FD6DE9E32147B11B0037E08D /* wglew.h */,
+				FD6DE9E42147B11B0037E08D /* glew.h */,
+			);
+			name = GLEW;
+			path = TelloVideoDecoder/GLEW;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FD58512220D008FD00E47889 /* TelloVideoDecoder */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FD58512920D008FD00E47889 /* Build configuration list for PBXNativeTarget "TelloVideoDecoder" */;
+			buildPhases = (
+				FD58511F20D008FD00E47889 /* Sources */,
+				FD58512020D008FD00E47889 /* Frameworks */,
+				FD58512120D008FD00E47889 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TelloVideoDecoder;
+			productName = TelloVideoDecoder;
+			productReference = FD58512320D008FD00E47889 /* TelloVideoDecoder.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FD58511B20D008FD00E47889 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0940;
+				ORGANIZATIONNAME = "Akihiro Komori";
+				TargetAttributes = {
+					FD58512220D008FD00E47889 = {
+						CreatedOnToolsVersion = 9.4;
+					};
+				};
+			};
+			buildConfigurationList = FD58511E20D008FD00E47889 /* Build configuration list for PBXProject "TelloVideoDecoder" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = FD58511A20D008FD00E47889;
+			productRefGroup = FD58512420D008FD00E47889 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FD58512220D008FD00E47889 /* TelloVideoDecoder */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FD58512120D008FD00E47889 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FD58511F20D008FD00E47889 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FD6DE9F12147B13B0037E08D /* RenderAPI_D3D11.cpp in Sources */,
+				FD6DE9E52147B11C0037E08D /* glew.c in Sources */,
+				FD6DE9F72147B13B0037E08D /* TelloVideoDecoder.cpp in Sources */,
+				FD6DE9F62147B13B0037E08D /* RenderingPlugin.cpp in Sources */,
+				FD6DE9F82147B13B0037E08D /* RenderAPI.cpp in Sources */,
+				FD6DE9F32147B13B0037E08D /* RenderAPI_Metal.mm in Sources */,
+				FD6DE9F92147B13B0037E08D /* RenderAPI_D3D12.cpp in Sources */,
+				FD6DE9F52147B13B0037E08D /* RenderAPI_OpenGLCoreES.cpp in Sources */,
+				FD6DE9F22147B13B0037E08D /* RenderAPI_OpenGL2.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		FD58512720D008FD00E47889 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				STRIP_STYLE = "non-global";
+				VALID_ARCHS = x86_64;
+			};
+			name = Debug;
+		};
+		FD58512820D008FD00E47889 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = macosx;
+				STRIP_STYLE = "non-global";
+				VALID_ARCHS = x86_64;
+			};
+			name = Release;
+		};
+		FD58512A20D008FD00E47889 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				INFOPLIST_FILE = "$(SRCROOT)/TelloVideoDecoder/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/Cellar/ffmpeg/4.0/lib,
+					/usr/local/Cellar/x264/r2854/lib,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.blogspot.comolog.TelloVideoDecoder;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		FD58512B20D008FD00E47889 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				INFOPLIST_FILE = "$(SRCROOT)/TelloVideoDecoder/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/Cellar/ffmpeg/4.0/lib,
+					/usr/local/Cellar/x264/r2854/lib,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.blogspot.comolog.TelloVideoDecoder;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FD58511E20D008FD00E47889 /* Build configuration list for PBXProject "TelloVideoDecoder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FD58512720D008FD00E47889 /* Debug */,
+				FD58512820D008FD00E47889 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FD58512920D008FD00E47889 /* Build configuration list for PBXNativeTarget "TelloVideoDecoder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FD58512A20D008FD00E47889 /* Debug */,
+				FD58512B20D008FD00E47889 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FD58511B20D008FD00E47889 /* Project object */;
+}
