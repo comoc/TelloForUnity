@@ -10,7 +10,8 @@ This project is including the following modules.
 * Modified source code of [NativeRenderingPlugin](https://bitbucket.org/Unity-Technologies/graphicsdemos/src/default/NativeRenderingPlugin/)
 * Pre-built DLLs for Windows 64 bit of [FFmpeg](https://www.ffmpeg.org/)
 
-At this time, Windows 64 bit ~~and macOS 64 bit~~ version only. (macOS version is in preparation)
+At this time, Windows 64 bit and macOS 64 bit versions are supported.
+Android (including Oculus Go) version is experimentally supported.
 
 ## Installation
 
@@ -30,9 +31,13 @@ Please confirm the Windows Firewall settings of your Unity Editor. Public networ
 
 ### macOS Specific Settings
 
-* Before using, ```brew install x264 ffmpeg``` is required.
+Before using, ```brew install x264 ffmpeg``` is required.
 
-## Basic Usage
+### Oculus Go Specific Settings
+
+Scenes/OculusGo is an example. Before opening the scene, [Oculus Utilities For Unity](https://developer.oculus.com/downloads/unity/) should be imported.
+
+## Basic Usage for Windows or macOS
 
 * Open the TelloUnityDemo project into Unity Editor.
 * Edit > Project Settings > Player > Other Settings > "Scripting Runtime Version" as ".NET 4.x Equivalent".
